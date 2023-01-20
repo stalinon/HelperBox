@@ -5,7 +5,7 @@ namespace HelperBox.Database;
 /// <summary>
 ///     Базовый класс таблицы
 /// </summary>
-public class BaseEntity
+public class Entity
 {
     /// <summary>
     ///     Идентификатор сущности в БД
