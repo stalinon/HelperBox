@@ -9,10 +9,10 @@ namespace HelperBox.Database;
 /// </summary>
 internal sealed class DatabaseContextFactory : IDesignTimeDbContextFactory<DatabaseContext>
 {
-    private readonly ConfigurationService _configurationService;
+    private readonly IConfigurationService _configurationService;
 
     /// <inheritdoc cref="DatabaseContextFactory" />
-    public DatabaseContextFactory(ConfigurationService configurationService) 
+    public DatabaseContextFactory(IConfigurationService configurationService) 
         => _configurationService = configurationService;
 
     /// <inheritdoc/>

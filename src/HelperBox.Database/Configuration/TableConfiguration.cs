@@ -9,20 +9,18 @@ namespace HelperBox.Database.Configuration;
 public class TableConfiguration<TEntity>
     where TEntity : Entity, new()
 {
-    private static readonly List<TableIndex<TEntity>> _indices = new();
+    #region Fields
 
-    /// <summary>
-    ///     Индексы таблицы
-    /// </summary>
-    internal TableIndex<TEntity>[] Indices => _indices.ToArray();
+    private static readonly List<IConfigItem> _configItems = new();
+
+    #endregion
+
+    #region Methods
 
     /// <summary>
     ///     Конфигурировать БД
     /// </summary>
-    internal static void Setup(ModelBuilder modelBuilder)
-    {
-        SetupIndices(modelBuilder);
-    }
+    internal static void Setup(ModelBuilder modelBuilder) => _configItems.ForEach(i => i.Setup(modelBuilder));
 
     /// <summary>
     ///     Добавить новый индекс
@@ -32,11 +30,44 @@ public class TableConfiguration<TEntity>
         bool isUnique = false)
     {
         var index = new TableIndex<TEntity>(propertySelector, isUnique);
-        _indices.Add(index);
+        _configItems.Add(index);
 
         return this;
     }
 
-    private static void SetupIndices(ModelBuilder modelBuilder) 
-        => _indices.ForEach(i => i.Setup(modelBuilder));
+    /// <summary>
+    ///     Добавить новую связь один-к-одному
+    /// </summary>
+    public TableConfiguration<TEntity> AddConnection<TSecondEntity>(
+        Expression<Func<TEntity, TSecondEntity?>> hasOneSelector,
+        Expression<Func<TSecondEntity, TEntity?>> withOneSelector,
+        Expression<Func<TSecondEntity, object?>> foreignKeySelector,
+        bool isRequired = false)
+        where TSecondEntity : Entity, new()
+    {
+        var connection = TableConnection<TEntity, TSecondEntity>.CreateOneToOneConnection(
+            hasOneSelector, withOneSelector, foreignKeySelector, isRequired);
+        _configItems.Add(connection);
+
+        return this;
+    }
+
+    /// <summary>
+    ///     Добавить новую связь один-ко-многим
+    /// </summary>
+    public TableConfiguration<TEntity> AddConnection<TSecondEntity>(
+        Expression<Func<TEntity, IEnumerable<TSecondEntity>?>> hasManySelector,
+        Expression<Func<TSecondEntity, TEntity?>> withOneSelector,
+        Expression<Func<TSecondEntity, object?>> foreignKeySelector,
+        bool isRequired = false)
+        where TSecondEntity : Entity, new()
+    {
+        var connection = TableConnection<TEntity, TSecondEntity>.CreateOneToManyConnection(
+            hasManySelector, withOneSelector, foreignKeySelector, isRequired);
+        _configItems.Add(connection);
+
+        return this;
+    }
+
+    #endregion
 }

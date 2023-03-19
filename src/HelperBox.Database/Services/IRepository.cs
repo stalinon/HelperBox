@@ -50,7 +50,7 @@ public interface IRepository<TEntity>
     Task<TEntity[]> GetAllAsync(
         Expression<Func<TEntity, bool>>? filter = null,
         Expression<Func<TEntity, object>>? sort = null,
-        SortType sortDirection = SortType.Ascending,
+        SortType sortDirection = SortType.ASC,
         CancellationToken cancellationToken = default);
 
     /// <summary>

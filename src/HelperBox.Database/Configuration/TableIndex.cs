@@ -9,9 +9,11 @@ namespace HelperBox.Database.Configuration;
 /// <summary>
 ///     Индекс таблицы
 /// </summary>
-internal class TableIndex<TEntity>
+internal class TableIndex<TEntity> : IConfigItem
     where TEntity : Entity, new()
 {
+    #region Properties
+
     /// <summary>
     ///     Индексированные колонки таблицы
     /// </summary>
@@ -27,6 +29,10 @@ internal class TableIndex<TEntity>
     /// </summary>
     private bool IsUnique { get; }
 
+    #endregion
+
+    #region Constructor
+
     /// <inheritdoc cref="TableIndex{TEntity}" />
     /// <param name="propertySelector"> Выбор свойств (колонок таблицы) </param>
     /// <param name="isUnique"> Явяется ли индекс уникальным </param>
@@ -37,10 +43,14 @@ internal class TableIndex<TEntity>
         IsUnique = isUnique;
     }
 
+    #endregion
+
+    #region Methods
+
     /// <summary>
     ///     Настроить индекс в БД
     /// </summary>
-    internal void Setup(ModelBuilder modelBuilder)
+    public void Setup(ModelBuilder modelBuilder)
         => modelBuilder.Entity<TEntity>()
                        .HasIndex(PropertySelector)
                        .HasDatabaseName(ToString())
@@ -48,8 +58,16 @@ internal class TableIndex<TEntity>
 
     /// <inheritdoc />
     public override string ToString()
-        => $"IX_{StringColumns + (IsUnique ? "_unique" : string.Empty)}";
+    {
+        return $"IX_{GetStringRepresentationOfNameAndColumns() + (IsUnique ? "_unique" : string.Empty)}";
 
-    private string StringColumns
-        => string.Join("_", Columns.Select(c => c.GetCustomAttribute<ColumnAttribute>()!.Name));
+        string GetStringRepresentationOfNameAndColumns() 
+            => string.Join(
+                "_",
+                Columns.Select(c => c.GetCustomAttribute<ColumnAttribute>()!.Name)
+                       .Prepend(typeof(TEntity).GetCustomAttribute<TableAttribute>()!.Name));
+
+    }
+
+    #endregion
 }

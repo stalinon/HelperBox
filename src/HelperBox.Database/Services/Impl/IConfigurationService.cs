@@ -5,8 +5,8 @@ namespace HelperBox.Database.Services.Impl;
 /// <summary>
 ///     Сервис конфигурации базы данных
 /// </summary>
-public abstract class ConfigurationService
+public interface IConfigurationService
 {
     /// <inheritdoc />
-    public abstract void Setup(ModelBuilder modelBuilder);
+    void Setup(ModelBuilder modelBuilder);
 }

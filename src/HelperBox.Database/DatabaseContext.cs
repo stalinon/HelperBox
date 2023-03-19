@@ -8,10 +8,10 @@ namespace HelperBox.Database;
 /// </summary>
 public class DatabaseContext : DbContext
 {
-    private readonly ConfigurationService _configurationService;
+    private readonly IConfigurationService _configurationService;
 
     /// <inheritdoc cref="DatabaseContext" />
-    public DatabaseContext(ConfigurationService configurationService, DbContextOptions options) : base(options) 
+    public DatabaseContext(IConfigurationService configurationService, DbContextOptions options) : base(options) 
         => _configurationService = configurationService;
 
     /// <inheritdoc />

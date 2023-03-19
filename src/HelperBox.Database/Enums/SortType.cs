@@ -8,10 +8,10 @@ public enum SortType
     /// <summary>
     ///     По возрастанию
     /// </summary>
-    Ascending,
+    ASC,
 
     /// <summary>
     ///     По убыванию
     /// </summary>
-    Descending
+    DESC
 }

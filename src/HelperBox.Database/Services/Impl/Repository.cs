@@ -36,7 +36,7 @@ public class Repository<TEntity> : IRepository<TEntity>
     public virtual async Task<TEntity[]> GetAllAsync(
         Expression<Func<TEntity, bool>>? filter = null,
         Expression<Func<TEntity, object>>? sort = null,
-        SortType sortDirection = SortType.Ascending,
+        SortType sortDirection = SortType.ASC,
         CancellationToken cancellationToken = default)
     {
         var query = CreateQuery(filter);
@@ -44,8 +44,8 @@ public class Repository<TEntity> : IRepository<TEntity>
         {
             query = sortDirection switch
             {
-                SortType.Ascending => query.OrderBy(sort),
-                SortType.Descending => query.OrderByDescending(sort),
+                SortType.ASC => query.OrderBy(sort),
+                SortType.DESC => query.OrderByDescending(sort),
                 _ => throw new ArgumentOutOfRangeException()
             };
         }

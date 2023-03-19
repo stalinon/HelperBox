@@ -20,14 +20,14 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection ConfigureDatabase<TConfigurationService, TDbContext>(
         this IServiceCollection services,
         string connectionString)
-        where TConfigurationService : ConfigurationService
+        where TConfigurationService : class, IConfigurationService
         where TDbContext : DatabaseContext
     {
         Environment.SetEnvironmentVariable(CONNECTION_STRING_HB, connectionString);
 
         services.AddDbContext<TDbContext>(options => options.UseNpgsql(connectionString));
-        services.AddSingleton<ConfigurationService, TConfigurationService>();
-        services.AddSingleton<ConfigurationService, TConfigurationService>();
+        services.AddSingleton<IConfigurationService, TConfigurationService>();
+        services.AddSingleton<IConfigurationService, TConfigurationService>();
 
         var entityTypes = (Type[])typeof(TDbContext)
             .GetMethod(nameof(DatabaseContext.GetEntityTypes))!
