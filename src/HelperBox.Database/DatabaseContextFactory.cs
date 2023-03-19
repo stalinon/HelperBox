@@ -9,11 +9,15 @@ namespace HelperBox.Database;
 /// </summary>
 internal sealed class DatabaseContextFactory : IDesignTimeDbContextFactory<DatabaseContext>
 {
-    private readonly IConfigurationService _configurationService;
+    private readonly ConfigurationService _configurationService;
+    private readonly IServiceProvider _serviceProvider;
 
     /// <inheritdoc cref="DatabaseContextFactory" />
-    public DatabaseContextFactory(IConfigurationService configurationService) 
-        => _configurationService = configurationService;
+    public DatabaseContextFactory(ConfigurationService configurationService, IServiceProvider serviceProvider)
+    {
+        _configurationService = configurationService;
+        _serviceProvider = serviceProvider;
+    }
 
     /// <inheritdoc/>
     public DatabaseContext CreateDbContext(string[] args)
@@ -25,7 +29,7 @@ internal sealed class DatabaseContextFactory : IDesignTimeDbContextFactory<Datab
             options => options.MigrationsHistoryTable("__EFMigrationsHistory")
         );
 
-        return new DatabaseContext(_configurationService, optionsBuilder.Options);
+        return new DatabaseContext(_configurationService, optionsBuilder.Options, _serviceProvider);
     }
 }
 

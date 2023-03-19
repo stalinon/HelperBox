@@ -29,6 +29,41 @@ internal class TableIndex<TEntity> : IConfigItem
     /// </summary>
     private bool IsUnique { get; }
 
+    /// <summary>
+    ///     Название таблицы
+    /// </summary>
+    private string TableName { get; } = typeof(TEntity).GetCustomAttribute<TableAttribute>()!.Name;
+
+    /// <summary>
+    ///     Названия колонок
+    /// </summary>
+    private string?[] ColumnNames { get; }
+
+    /// <inheritdoc />
+    public Type Table => typeof(TEntity);
+
+    /// <inheritdoc />
+    public string Type { get; } = "Index";
+
+    /// <inheritdoc />
+    public string Name => ToString();
+
+    /// <inheritdoc />
+    public string Description
+    {
+        get
+        {
+            var desc = $"This {(IsUnique ? "unique" : string.Empty)} index applied to a several columns of table `{TableName}`:\n";
+
+            foreach (var column in ColumnNames)
+            {
+                desc += $"+ `{column}`;\n";
+            }
+
+            return desc;
+        }
+    }
+
     #endregion
 
     #region Constructor
@@ -41,6 +76,7 @@ internal class TableIndex<TEntity> : IConfigItem
         PropertySelector = propertySelector;
         Columns = propertySelector.GetPropertyAccessList().ToArray();
         IsUnique = isUnique;
+        ColumnNames = Columns.Select(c => c.GetCustomAttribute<ColumnAttribute>()!.Name).ToArray();
     }
 
     #endregion
@@ -62,10 +98,7 @@ internal class TableIndex<TEntity> : IConfigItem
         return $"IX_{GetStringRepresentationOfNameAndColumns() + (IsUnique ? "_unique" : string.Empty)}";
 
         string GetStringRepresentationOfNameAndColumns() 
-            => string.Join(
-                "_",
-                Columns.Select(c => c.GetCustomAttribute<ColumnAttribute>()!.Name)
-                       .Prepend(typeof(TEntity).GetCustomAttribute<TableAttribute>()!.Name));
+            => string.Join("_", ColumnNames.Prepend(TableName));
 
     }
 

@@ -1,9 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HelperBox.Database.Configuration;
 
@@ -16,4 +11,24 @@ internal interface IConfigItem
     ///     Установить конфигурацию
     /// </summary>
     void Setup(ModelBuilder modelBuilder);
+
+    /// <summary>
+    ///     Тип таблицы, к которой относится элемент конфигурации
+    /// </summary>
+    Type Table { get; }
+
+    /// <summary>
+    ///     Тип элемента конфигурации
+    /// </summary>
+    string Type { get; }
+
+    /// <summary>
+    ///     Название элемента конфигурации
+    /// </summary>
+    string Name { get; }
+
+    /// <summary>
+    ///     Описание элемента конфигурации
+    /// </summary>
+    string Description { get; }
 }

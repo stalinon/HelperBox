@@ -1,5 +1,6 @@
 ﻿using HelperBox.Database.Enums;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -16,21 +17,31 @@ internal class TableConnection<TFirstEntity, TSecondEntity> : IConfigItem
     #region Properties
 
     /// <summary>
+    ///     Название первой таблицы
+    /// </summary>
+    private string FirstTableName { get; } = typeof(TFirstEntity).GetCustomAttribute<TableAttribute>()!.Name;
+
+    /// <summary>
+    ///     Название второй таблицы
+    /// </summary>
+    private string SecondTableName { get; } = typeof(TSecondEntity).GetCustomAttribute<TableAttribute>()!.Name;
+
+    /// <summary>
     ///     Тип связи
     /// </summary>
-    internal ConnectionType ConnectionType { get; private set; }
+    private ConnectionType ConnectionType { get; set; }
 
     #region Single
 
     /// <summary>
     ///     Выражение выбора поля для маппинга
     /// </summary>
-    internal Expression<Func<TFirstEntity, TSecondEntity?>> HasSelector { get; private set; } = null!;
+    private Expression<Func<TFirstEntity, TSecondEntity?>> HasSelector { get; set; } = null!;
 
     /// <summary>
     ///     Выражение выбора поля для маппинга
     /// </summary>
-    internal Expression<Func<TSecondEntity, TFirstEntity?>> WithSelector { get; private set; } = null!;
+    private Expression<Func<TSecondEntity, TFirstEntity?>> WithSelector { get; set; } = null!;
 
     #endregion
 
@@ -39,19 +50,42 @@ internal class TableConnection<TFirstEntity, TSecondEntity> : IConfigItem
     /// <summary>
     ///     Выражение выбора поля для маппинга
     /// </summary>
-    internal Expression<Func<TFirstEntity, IEnumerable<TSecondEntity>?>> HasManySelector { get; private set; } = null!;
+    private Expression<Func<TFirstEntity, IEnumerable<TSecondEntity>?>> HasManySelector { get; set; } = null!;
 
     #endregion
 
     /// <summary>
     ///     Выражение выбора поля для foreign key
     /// </summary>
-    internal Expression<Func<TSecondEntity, object?>> ForeignKeySelector { get; private set; } = null!;
+    private Expression<Func<TSecondEntity, object?>> ForeignKeySelector { get; set; } = null!;
 
     /// <summary>
     ///     Обязательно ли отношение
     /// </summary>
-    internal bool IsRequired { get; private set; }
+    private bool IsRequired { get; set; }
+
+    /// <inheritdoc />
+    public Type Table => typeof(TFirstEntity);
+
+    /// <inheritdoc />
+    public string Type { get; } = "Relationship";
+
+    /// <inheritdoc />
+    public string Name => ToString();
+
+    /// <inheritdoc />
+    public string Description
+    {
+        get
+        {
+            var desc = $"This {(IsRequired ? "required" : string.Empty)} {GetConnectionTypeName()} relationship is beetween two tables: \n";
+            desc += $"+ `{FirstTableName}`";
+            desc += $"+ `{SecondTableName}`";
+            desc += $"Foreign key is the `{ForeignKeySelector.GetPropertyAccess().GetCustomAttribute<ColumnAttribute>()!.Name}` column.";
+
+            return desc;
+        }
+    }
 
     #endregion
 
@@ -140,7 +174,14 @@ internal class TableConnection<TFirstEntity, TSecondEntity> : IConfigItem
     }
 
     public override string ToString() 
-        => $"FK_{typeof(TFirstEntity).GetCustomAttribute<TableAttribute>()!.Name}_{typeof(TSecondEntity).GetCustomAttribute<TableAttribute>()!.Name}";
+        => $"FK_{FirstTableName}_{SecondTableName}";
+
+    private string GetConnectionTypeName() => ConnectionType switch
+    {
+        ConnectionType.ONE_TO_ONE => "one-to-one",
+        ConnectionType.ONE_TO_MANY => "one-to-many",
+        _ => throw new ArgumentOutOfRangeException()
+    };
 
     #endregion
 }
