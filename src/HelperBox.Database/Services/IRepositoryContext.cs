@@ -3,7 +3,7 @@
 /// <summary>
 ///     Контекст репозиториев
 /// </summary>
-internal interface IRepositoryContext : IDisposable
+public interface IRepositoryContext : IDisposable
 {
     /// <summary>
     ///     Сохранить контекст БД

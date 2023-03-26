@@ -63,5 +63,8 @@ public static class ServiceCollectionExtensions
                 typeof(IRepository<>).MakeGenericType(entityType),
                 typeof(Repository<>).MakeGenericType(entityType));
         }
+
+        services.AddScoped<IRepositoryContext, RepositoryContext>();
+        services.AddSingleton<IRepositoryContextFactory, RepositoryContextFactory>();
     }
 }

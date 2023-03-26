@@ -1,13 +1,12 @@
 ﻿namespace HelperBox.Database.Services;
 
 /// <summary>
-///     Фабрика <see cref="IRepositoryContext" />
+///     Фабрика контекстов репозиториев
 /// </summary>
-internal interface IRepositoryContextFactory<TDbContext>
-    where TDbContext : DatabaseContext
+public interface IRepositoryContextFactory
 {
     /// <summary>
-    ///     Создаёт подключение к БД
+    ///     Создать scoped-контекст репозиториев
     /// </summary>
-    TDbContext CreateScopeDatabase();
+    IRepositoryContext CreateScope();
 }
